@@ -61,8 +61,15 @@ public class AddContactActivity extends AppCompatActivity {
     }
 
     public void buttonCancel_OnClick(View v){
-        Intent main = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(main);
+        if(isNewContact){
+            Intent main = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(main);
+        }
+        else{
+            Intent allContact = new Intent(getApplicationContext(), DisplayAllContactActivity.class);
+            startActivity(allContact);
+        }
+
     }
 
 }
