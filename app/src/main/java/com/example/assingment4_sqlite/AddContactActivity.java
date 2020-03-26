@@ -14,6 +14,10 @@ public class AddContactActivity extends AppCompatActivity {
     EditText editTextName;
     EditText editTextPhone;
     EditText editTextStreet;
+    TextView errorTextView;
+    Contact ContactInfo;
+
+    boolean isNewContact = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,16 +27,42 @@ public class AddContactActivity extends AppCompatActivity {
         editTextName = findViewById(R.id.editTextName);
         editTextPhone = findViewById(R.id.editTextPhone);
         editTextStreet = findViewById(R.id.editTextStreet);
+        errorTextView = findViewById(R.id.errorTextView);
+        Intent contact = getIntent();
+        ContactInfo = (Contact)contact.getSerializableExtra("ContactInfo");
+        if((ContactInfo) != null){
+            isNewContact = false;
+            editTextName.setText(ContactInfo.getName());
+            editTextPhone.setText(ContactInfo.getPhoneNumber());
+            editTextStreet.setText((ContactInfo.getStreet()));
+        }
     }
 
     public void buttonSaveContact_OnClick(View v){
-        db.addContact(new Contact(editTextName.getText().toString(),
-                editTextPhone.getText().toString(),
-                editTextStreet.getText().toString()));
+        if(editTextName.getText().toString().isEmpty()){
+            errorTextView.setText("'Name' is required");
+        } else{
+            if(isNewContact){
+                db.addContact(new Contact(editTextName.getText().toString(),
+                        editTextPhone.getText().toString(),
+                        editTextStreet.getText().toString()));
+            }
+            else{
+                ContactInfo.setName(editTextName.getText().toString());
+                ContactInfo.setPhoneNumber(editTextPhone.getText().toString());
+                ContactInfo.setStreet(editTextStreet.getText().toString());
+                db.updateContact(ContactInfo);
+            }
 
+            Intent main = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(main);
+        }
+
+    }
+
+    public void buttonCancel_OnClick(View v){
         Intent main = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(main);
     }
-
 
 }

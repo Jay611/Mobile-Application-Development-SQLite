@@ -4,13 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.List;
 
 import static com.example.assingment4_sqlite.MainActivity.db;
@@ -52,23 +55,23 @@ public class DisplayAllContactActivity extends AppCompatActivity {
         // Provide a reference to the views for each data item
         // Complex data items may need more than one view per item, and
         // you provide access to all the views for a data item in a view holder
-        public class MyViewHolder extends RecyclerView.ViewHolder {
+        class MyViewHolder extends RecyclerView.ViewHolder {
             // each data item is just a string in this case
-            public TextView name,ph_no;
-            public ImageView deleteContact;
-            public ImageView editContact;
+            TextView name,ph_no;
+            ImageView editContact;
+            ImageView deleteContact;
 
-            public MyViewHolder(View itemView) {
+            MyViewHolder(View itemView) {
                 super(itemView);
                 name = itemView.findViewById(R.id.contact_name);
                 ph_no = itemView.findViewById(R.id.ph_no);
-                deleteContact = itemView.findViewById(R.id.delete_contact);
                 editContact = itemView.findViewById(R.id.edit_contact);
+                deleteContact = itemView.findViewById(R.id.delete_contact);
             }
         }
 
         // Provide a suitable constructor (depends on the kind of dataset)
-        public MyAdapter(List<Contact> myDataset) {
+        MyAdapter(List<Contact> myDataset) {
             mDataset = myDataset;
         }
 
@@ -80,8 +83,7 @@ public class DisplayAllContactActivity extends AppCompatActivity {
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.my_text_view, parent, false);
 
-            MyViewHolder vh = new MyViewHolder(v);
-            return vh;
+            return new MyViewHolder(v);
         }
 
         // Replace the contents of a view (invoked by the layout manager)
@@ -92,7 +94,22 @@ public class DisplayAllContactActivity extends AppCompatActivity {
             final Contact contact = mDataset.get(position);
             holder.name.setText(contact.getName());
             holder.ph_no.setText(contact.getPhoneNumber());
-
+            holder.editContact.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    Intent editIntent = new Intent(getApplicationContext(), AddContactActivity.class);
+                    editIntent.putExtra("ContactInfo", contact);
+                    startActivity(editIntent);
+                }
+            });
+            holder.deleteContact.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    db.deleteContact(contact);
+                    Intent deleteIntent = new Intent(getApplicationContext(), DisplayAllContactActivity.class);
+                    startActivity(deleteIntent);
+                }
+            });
         }
 
         // Return the size of your dataset (invoked by the layout manager)
@@ -102,5 +119,8 @@ public class DisplayAllContactActivity extends AppCompatActivity {
         }
     }
 
-
+    public void buttonMain_OnClick(View v){
+        Intent main = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(main);
+    }
 }
